@@ -1,0 +1,33 @@
+# Conda environment for the Greater Banjul flood susceptibility pipeline.
+# Implementation Plan §2 (technology stack); ToR §6 (tools) and §9 (reproducibility).
+# Create with:  micromamba env create -f environment.yml
+# All packages come from conda-forge so the GDAL stack is consistent (Plan §14).
+# After a successful build, exact versions are frozen in environment.lock.yml.
+name: flood-banjul
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  # raster
+  - gdal>=3.9
+  - rasterio>=1.4
+  - rioxarray
+  - numpy
+  # vector
+  - geopandas>=1.0
+  - pyogrio
+  - shapely>=2.0
+  - osmium-tool          # clip the Geofabrik OSM extract to the study area
+  # hydrology (Plan §5)
+  - whitebox
+  # analysis
+  - pandas
+  - mapclassify          # Jenks / quantile classes (Plan §5.4)
+  - matplotlib
+  # utilities
+  - pyyaml
+  - requests
+  - tqdm
+  # quality assurance (Plan §10)
+  - pytest
+  - make

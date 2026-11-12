@@ -1,0 +1,62 @@
+# Single source of truth for every pipeline parameter.
+# Implementation Plan §4 (key parameters) and §5 (susceptibility model).
+# Change values here, never inside the scripts.
+
+project:
+  name: flood-susceptibility-greater-banjul
+  # Shown in the web map and README (ToR §9, §11)
+  disclaimer: >-
+    Susceptibility index for illustration and learning, not a validated flood
+    forecast. Do not use for planning or safety decisions.
+
+# --- Study area (ToR §3; Plan §4) -------------------------------------------
+study_area:
+  # geoBoundaries gbOpen GMB ADM2, pinned to a release commit for reproducibility.
+  boundaries_url: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/GMB/ADM2/geoBoundaries-GMB-ADM2.geojson
+  boundaries_source: geoBoundaries gbOpen GMB ADM2 (year represented 2020)
+  boundaries_licence: CC BY 4.0
+  name_field: shapeName
+  # Banjul City Council + Kanifing Municipal Council + Kombo North/Saint Mary
+  units:
+    banjul: [Banjul Central, Banjul North, Banjul South]
+    kanifing: [Bakau, Jeshwang, Serrekunda Central, Serrekunda East, Serrekunda West]
+    kombo_north: [Kombo North]
+  # Fallback if the boundaries are unsuitable (lon_min, lat_min, lon_max, lat_max)
+  fallback_bbox: [-16.83, 13.25, -16.55, 13.50]
+  gap_closing_m: 3000          # fills the Tanbi Wetland gap left by ADM2 units (Plan §5.3)
+  hydrology_buffer_m: 2000     # avoid edge effects in flow routing (Plan §4)
+
+# --- Coordinate systems (Plan §4) ---------------------------------------------
+crs:
+  processing: EPSG:32628       # WGS 84 / UTM zone 28N, metres
+  web: EPSG:4326
+resolution_m: 30
+
+# --- Hydrology (Plan §5.3) ----------------------------------------------------
+hydrology:
+  stream_threshold_cells: 500  # tuned on Day 3 against OSM waterways
+
+# --- Susceptibility factors and weights (Plan §5.2) ---------------------------
+# direction: "low" = low values are more susceptible (inverted when normalised)
+factors:
+  hand:             {weight: 0.30, direction: low}
+  elevation:        {weight: 0.20, direction: low}
+  depression_depth: {weight: 0.20, direction: high}
+  twi:              {weight: 0.15, direction: high}
+  landcover:        {weight: 0.15, direction: high}
+use_landcover: true            # if false, other weights are rescaled to sum to 1
+normalisation_percentiles: [2, 98]
+
+# --- Classification (Plan §5.4) ----------------------------------------------
+classification:
+  method: jenks                # jenks | quantiles
+  n_classes: 3
+  labels: [Low, Medium, High]
+  jenks_sample_size: 50000
+  random_seed: 42
+
+# --- Rainfall (Plan §7) -------------------------------------------------------
+rainfall:
+  climatology_years: [1991, 2020]
+  example_season_year: 2022
+  heavy_rain_mm_per_day: 50    # to be justified from CHIRPS percentiles

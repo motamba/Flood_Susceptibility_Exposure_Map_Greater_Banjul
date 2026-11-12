@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!-- Web map (ToR §5 step 10, §7 D3; Implementation Plan §9). No build step. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Greater Banjul Flood Susceptibility</title>
+  <meta name="description" content="Flood susceptibility and exposure web map for Greater Banjul, The Gambia. Susceptibility index for learning, not a flood forecast.">
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="title">
+      <h1>Greater Banjul Flood Susceptibility</h1>
+      <p class="disclaimer">Susceptibility index for learning, <strong>not a flood forecast</strong>. Do not use for planning or safety decisions.</p>
+    </div>
+    <button id="panel-toggle" class="panel-toggle" aria-controls="panel" aria-expanded="true">Panel</button>
+  </header>
+
+  <main class="layout">
+    <div id="map" class="map" role="region" aria-label="Map"></div>
+
+    <aside id="panel" class="panel">
+      <nav class="tabs" role="tablist">
+        <button role="tab" class="tab active" data-tab="layers" aria-selected="true">Layers</button>
+        <button role="tab" class="tab" data-tab="exposure" aria-selected="false">Exposure</button>
+        <button role="tab" class="tab" data-tab="rainfall" aria-selected="false">Rainfall</button>
+        <button role="tab" class="tab" data-tab="about" aria-selected="false">About</button>
+      </nav>
+
+      <section id="tab-layers" class="tab-body" role="tabpanel">
+        <h2>Layers</h2>
+        <ul id="layer-list" class="layer-list"></ul>
+        <h2>Legend</h2>
+        <div id="legend" class="legend"></div>
+      </section>
+
+      <section id="tab-exposure" class="tab-body" role="tabpanel" hidden>
+        <h2>Exposure</h2>
+        <p class="pending-note">Counts of buildings, roads, schools and health facilities per susceptibility class will appear here once the exposure analysis is complete.</p>
+        <p class="small">Counts are minimum values, because OpenStreetMap coverage is incomplete.</p>
+      </section>
+
+      <section id="tab-rainfall" class="tab-body" role="tabpanel" hidden>
+        <h2>Rainfall context</h2>
+        <p class="pending-note">The monthly rainfall climatology and a daily wet-season chart (CHIRPS) will appear here.</p>
+      </section>
+
+      <section id="tab-about" class="tab-body" role="tabpanel" hidden>
+        <h2>About</h2>
+        <p>This map shows where flooding is most likely in Greater Banjul (Banjul, Kanifing Municipal Council and Kombo North), based on terrain and land cover. It also shows which assets lie in the most susceptible areas.</p>
+        <h3>Method (summary)</h3>
+        <p>A weighted overlay of terrain factors: height above nearest drainage, elevation, depression depth, wetness index and land cover. The index is classified into low, medium and high, and the weights are tested in a sensitivity analysis.</p>
+        <h3>Limitations</h3>
+        <ul>
+          <li>The elevation data has 30 m resolution, which limits detail in flat coastal areas.</li>
+          <li>No ground-truth flood data; plausibility checks only.</li>
+          <li>Weights are subjective and are tested for sensitivity.</li>
+        </ul>
+        <h3>Data and licences</h3>
+        <ul>
+          <li>Boundaries: geoBoundaries (CC BY 4.0)</li>
+          <li>Basemap: OpenFreeMap, © OpenStreetMap contributors (ODbL)</li>
+        </ul>
+        <p class="small">Personal project, November 2026. Data build: <span id="built">-</span></p>
+      </section>
+    </aside>
+  </main>
+
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Large or regenerable data (Implementation Plan §3)
+data/raw/*
+!data/raw/MANIFEST.csv
+data/interim/
+*.part
+*.aux.xml
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Editors / OS
+.vscode/
+.DS_Store
+
+# Private planning documents (kept local, not published)
+ToR_1_Flood_Susceptibility_Exposure_Map_Greater_Banjul.md
+IMPLEMENTATION_PLAN.md

@@ -1,0 +1,9 @@
+[project]
+name = "flood-susceptibility-greater-banjul"
+version = "0.0.1"
+description = "Flood susceptibility and exposure web map for Greater Banjul"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
