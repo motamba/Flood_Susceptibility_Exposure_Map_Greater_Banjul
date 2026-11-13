@@ -31,6 +31,40 @@ All sources were checked on 12 November 2026. Rasters are read remotely and clip
 
 **Note on daily rainfall:** CHIRPS v3 daily values are not an independent daily product. They are 5-day (pentadal) totals spread across days using IMERG satellite timing (the `sat` variant). Daily peaks therefore show the timing only approximately; monthly totals are more reliable.
 
+## Method notes
+
+### DEM preparation and hydrology (`scripts/02_prepare_dem.py`)
+
+- **Grid:** FABDEM is reprojected (bilinear) to a 30 m grid in WGS 84 / UTM zone 28N (EPSG:32628), covering the study area plus a 2 km buffer to avoid edge effects in flow routing.
+- **Water mask:** FABDEM stores the sea as 0 m, so the DEM cannot separate water from land. Instead, a 30 m cell is water when at least 50% of its 10 m WorldCover cells are "permanent water bodies". Water cells are excluded from routing, so they act as outlets.
+- **Breaching, not filling, for flow routing:** depressions are breached with a least-cost method (WhiteboxTools v2.4.0, maximum 100 cells), and only what cannot be breached is filled. Filling everything would erase the hollows where rain water ponds in flat, low-lying Banjul.
+- **Depression depth:** the DEM is also filled separately, and *filled minus original* gives the depth of each hollow. It is kept as a susceptibility factor. Only 1.9% of land cells are more than 0.1 m deep (maximum 2.9 m), as expected for a smoothed bare-earth DEM.
+- **Flow:** D8 flow direction and flow accumulation are computed on the breached DEM.
+- **Stream threshold:** five thresholds were compared with OSM waterways. Agreement is the share of cells within 60 m of the other network ([table](outputs/tables/stream_threshold_tuning.csv)). The threshold of **1000 cells (0.9 km²)** was chosen: it gives 109 km of streams, close to the 114 km of mapped OSM waterways, with a better balance of agreement than lower thresholds.
+- **Why agreement is low (F1 ≈ 0.16):** most OSM waterways are tidal creeks in the Tanbi Wetland and man-made urban drains. Neither can be derived from a 30 m DEM. The DEM-derived streams describe the upland valley network, which OSM mostly does not map. Where both exist, they coincide.
+- **Drainage network:** derived streams, open water and OSM waterways (burned in) together form the drainage network used for HAND. This way, man-made drains and tidal creeks count as drainage.
+
+![DEM and hydrology](outputs/figures/dem_hydrology.png)
+
+### Susceptibility factors (`scripts/03_factors.py`)
+
+Every factor is scaled to 0–1, with 1 meaning more susceptible. Open water is excluded and shown as its own map layer.
+
+| Factor | How it is derived | Scaling | Weight |
+|---|---|---|---|
+| HAND (height above nearest drainage) | Height of each cell above the drainage cell it flows to (WhiteboxTools `ElevationAboveStream`) | Fixed 0–15 m, inverted. Classes after Nobre et al. (2011): below ≈5 m is flood-prone, above 15 m is upland | 0.30 |
+| Elevation | FABDEM | 2nd–98th percentile (1.0–27.7 m), inverted | 0.20 |
+| Depression depth | Filled minus original DEM | Fixed 0–1 m of ponding | 0.20 |
+| Topographic wetness index (TWI) | ln(a / tan β), with D-infinity specific contributing area; minimum slope 0.1° | 2nd–98th percentile | 0.15 |
+| Land cover | Runoff/wetness score per WorldCover class: built-up 1.0, wetland and mangrove 0.9, bare 0.7, cropland 0.5, grassland 0.4, shrubland 0.3, trees 0.2; averaged to 30 m | Already 0–1 | 0.15 |
+
+- **No separate slope factor:** 88% of the land is flatter than 1° (median 0.4°), so slope hardly varies here. Slope still enters through TWI.
+- **Fixed ranges** are used where a physical reference exists (HAND, ponding depth). They keep the scale the same when the DEM is swapped in the sensitivity test. Depression depth is zero for 98% of cells, so percentile scaling would rate any 5 cm hollow as maximum.
+- **Overlap between factors is low.** The highest Spearman correlation is 0.32, between HAND and TWI, and HAND vs elevation is only 0.22 ([table](outputs/tables/factor_correlation.csv)). HAND measures height relative to the local drainage, which differs from absolute height in a landscape crossed by creeks and drains, so the factors are not double-counting one another.
+- **Water and wetland:** 7.3 km² of open water and 47.0 km² of wetland and mangrove, mostly the Tanbi Wetland.
+
+![Factors](outputs/figures/factors.png)
+
 ## Reproduce
 
 ```bash
@@ -44,21 +78,6 @@ make test
 ```
 
 Raw data is downloaded by the scripts and is not stored in Git. Every downloaded file is listed with its URL, date, licence and checksum in [`data/raw/MANIFEST.csv`](data/raw/MANIFEST.csv).
-
-## Status
-
-| Step | Script | Status |
-|---|---|---|
-| 0 Study area | `00_study_area.py` | done |
-| 1 Data download | `01_download_data.py` | done |
-| 2 DEM preparation | `02_prepare_dem.py` | planned |
-| 3 Factor layers | `03_factors.py` | planned |
-| 4 Overlay and classes | `04_overlay_classify.py` | planned |
-| 5 Sensitivity | `05_sensitivity.py` | planned |
-| 6 Exposure | `06_exposure.py` | planned |
-| 7 Rainfall | `07_rainfall.py` | planned |
-| 8 Plausibility | `08_plausibility.py` | planned |
-| 9 Web export and map | `09_export_web.py`, `docs/` | map shell working; layers added as steps finish |
 
 Preview the map locally with `make serve`, then open http://localhost:8000.
 

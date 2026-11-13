@@ -33,8 +33,18 @@ const LAYERS = [
   },
   {
     id: "water", label: "Water and wetland", pending: "Day 4", visible: true,
-    layers: [{ type: "fill", paint: { "fill-color": "#6baed6", "fill-opacity": 0.5 } }],
-    legend: { title: "Water", items: [{ label: "Water / wetland mask", colour: "#6baed6" }] },
+    layers: [{
+      type: "fill",
+      paint: {
+        "fill-color": ["match", ["get", "type"], "water", "#4a90c8", "wetland", "#5fb58a", "#999999"],
+        "fill-opacity": ["match", ["get", "type"], "water", 0.7, 0.45],
+      },
+    }],
+    legend: { title: "Water and wetland", items: [
+      { label: "Open water (excluded from index)", colour: "#4a90c8" },
+      { label: "Wetland / mangrove (Tanbi)", colour: "#5fb58a" }] },
+    popup: (p) => `<div class="popup"><h4>${p.type === "water" ? "Open water" : "Wetland / mangrove"}</h4>
+      <table><tr><td>Total area</td><td>${Number(p.area_km2).toFixed(1)} km²</td></tr></table></div>`,
   },
   {
     id: "units", label: "Districts", visible: true,

@@ -1,0 +1,6 @@
+factor,direction,scaling,scale_low,scale_high,raw_min,raw_median,raw_max,norm_mean,coverage
+hand,low,fixed,0.0,15.0,0.0,3.803,28.243,0.682,1.0
+elevation,low,percentile,0.952,27.731,-1.301,14.591,32.985,0.526,1.0
+depression_depth,high,fixed,0.0,1.0,0.0,0.0,2.86,0.015,0.9892
+twi,high,percentile,7.217,15.322,4.917,9.901,21.411,0.367,1.0
+landcover,high,none,0.0,1.0,0.2,0.842,1.0,0.694,1.0

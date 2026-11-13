@@ -19,7 +19,7 @@ dependencies:
   - shapely>=2.0
   - osmium-tool          # clip the Geofabrik OSM extract to the study area
   # hydrology (Plan §5)
-  - whitebox
+  - whitebox             # downloads the WhiteboxTools binary on first use (v2.4.0 used)
   # analysis
   - pandas
   - mapclassify          # Jenks / quantile classes (Plan §5.4)

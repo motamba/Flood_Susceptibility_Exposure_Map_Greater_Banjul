@@ -66,18 +66,42 @@ resolution_m: 30
 
 # --- Hydrology (Plan §5.3) ----------------------------------------------------
 hydrology:
-  stream_threshold_cells: 500  # tuned on Day 3 against OSM waterways
+  stream_threshold_cells: 1000 # 0.9 km2; best F1 of usable options, 105 km vs 114 km OSM (Day 3)
+  threshold_candidates: [100, 250, 500, 1000, 2000]
+  breach_max_dist_cells: 100   # longest breach channel (3 km); rest is filled
+  water_class: 80              # WorldCover "permanent water bodies"
+  water_min_fraction: 0.5      # 30 m cell is water if >= 50% of 10 m cells are
+  osm_waterways: [river, stream, canal, drain, ditch]
+  agreement_tolerance_m: 60    # two cells: allows for DEM/OSM offset
 
 # --- Susceptibility factors and weights (Plan §5.2) ---------------------------
 # direction: "low" = low values are more susceptible (inverted when normalised)
+# scaling:   percentile = min-max on normalisation_percentiles, clipped to 0-1
+#            fixed      = min-max on a physically meaningful range [a, b] (metres)
+#            none       = already on a 0-1 scale (land-cover score)
 factors:
-  hand:             {weight: 0.30, direction: low}
-  elevation:        {weight: 0.20, direction: low}
-  depression_depth: {weight: 0.20, direction: high}
-  twi:              {weight: 0.15, direction: high}
-  landcover:        {weight: 0.15, direction: high}
+  hand:             {weight: 0.30, direction: low,  scaling: fixed, range: [0, 15]}   # HAND classes, Nobre et al. (2011): >15 m upland
+  elevation:        {weight: 0.20, direction: low,  scaling: percentile}
+  depression_depth: {weight: 0.20, direction: high, scaling: fixed, range: [0, 1]}    # metres of ponding
+  twi:              {weight: 0.15, direction: high, scaling: percentile}
+  landcover:        {weight: 0.15, direction: high, scaling: none}
 use_landcover: true            # if false, other weights are rescaled to sum to 1
 normalisation_percentiles: [2, 98]
+min_slope_deg: 0.1             # avoids division by zero in TWI on flat cells
+
+# Land-cover runoff / wetness score (0-1) per ESA WorldCover class (Plan §5.2).
+# High = surfaces that generate runoff (sealed) or hold water (wetlands).
+landcover_scores:
+  10: 0.2    # tree cover: interception and infiltration
+  20: 0.3    # shrubland
+  30: 0.4    # grassland
+  40: 0.5    # cropland: often bare in early wet season
+  50: 1.0    # built-up: sealed surfaces, fastest runoff
+  60: 0.7    # bare / sparse vegetation: crusting soils
+  90: 0.9    # herbaceous wetland: already saturated
+  95: 0.9    # mangroves: tidal, saturated
+  100: 0.4   # moss and lichen (not present)
+wetland_classes: [90, 95]      # shown with water on the map
 
 # --- Classification (Plan §5.4) ----------------------------------------------
 classification:

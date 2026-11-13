@@ -3,9 +3,18 @@
 Implementation Plan §4: every parameter lives in one config file so that
 results can be reproduced and every choice is visible (ToR §9).
 """
+import os
+import sys
 from pathlib import Path
 
 import yaml
+
+# When a script runs with the environment's python without "activating" the
+# environment, GDAL/PROJ cannot find their data files. Point them at it.
+_share = Path(sys.prefix) / "share"
+for _var, _dir in (("PROJ_DATA", _share / "proj"), ("GDAL_DATA", _share / "gdal")):
+    if _var not in os.environ and _dir.exists():
+        os.environ[_var] = str(_dir)
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIG_PATH = ROOT / "config" / "config.yaml"

@@ -24,7 +24,7 @@ LAYERS = [
     ("units", "study_area.gpkg", "units", ["shapeName", "group", "area_km2"]),
     # Added on later days (Plan §11):
     ("susceptibility", "susceptibility_classes.gpkg", None, ["class"]),        # Day 5
-    ("water", "water_mask.gpkg", None, None),                                  # Day 4
+    ("water", "water_mask.gpkg", None, ["type", "area_km2"]),                  # Day 4
     ("facilities", "facilities_exposed.gpkg", None, None),                     # Day 6
     ("reported_floods", "reported_floods.gpkg", None, None),                   # Day 6
 ]
