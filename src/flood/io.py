@@ -14,7 +14,7 @@ from tqdm import tqdm
 
 from flood.config import MANIFEST, ROOT
 
-FIELDS = ["file", "url", "source", "licence", "downloaded_utc", "bytes", "sha256"]
+FIELDS = ["file", "url", "source", "licence", "downloaded_utc", "bytes", "sha256", "note"]
 
 
 def sha256sum(path: Path) -> str:
@@ -25,11 +25,12 @@ def sha256sum(path: Path) -> str:
     return h.hexdigest()
 
 
-def _record(path: Path, url: str, source: str, licence: str) -> None:
+def record(path: Path, url: str, source: str, licence: str, note: str = "") -> None:
+    """Add or update the manifest row for a raw file."""
     rows = []
     if MANIFEST.exists():
         with open(MANIFEST, newline="", encoding="utf-8") as f:
-            rows = list(csv.DictReader(f))
+            rows = [{k: r.get(k, "") for k in FIELDS} for r in csv.DictReader(f)]
     rel = path.relative_to(ROOT).as_posix()
     rows = [r for r in rows if r["file"] != rel]
     rows.append({
@@ -41,6 +42,7 @@ def _record(path: Path, url: str, source: str, licence: str) -> None:
         .strftime("%Y-%m-%dT%H:%M:%SZ"),
         "bytes": path.stat().st_size,
         "sha256": sha256sum(path),
+        "note": note,
     })
     rows.sort(key=lambda r: r["file"])
     MANIFEST.parent.mkdir(parents=True, exist_ok=True)
@@ -51,7 +53,7 @@ def _record(path: Path, url: str, source: str, licence: str) -> None:
 
 
 def download(url: str, dest: Path, source: str, licence: str,
-             overwrite: bool = False) -> Path:
+             overwrite: bool = False, note: str = "") -> Path:
     """Download url to dest (skipped if present) and record it in the manifest."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists() and not overwrite:
@@ -67,5 +69,5 @@ def download(url: str, dest: Path, source: str, licence: str,
                     f.write(chunk)
                     bar.update(len(chunk))
         tmp.replace(dest)
-    _record(dest, url, source, licence)
+    record(dest, url, source, licence, note)
     return dest

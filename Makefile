@@ -7,7 +7,7 @@
 PY := python
 export PYTHONPATH := src
 
-STEPS := 00_study_area 09_export_web
+STEPS := 00_study_area 01_download_data 09_export_web
 
 .PHONY: all test serve clean-interim $(STEPS)
 

@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from flood.config import DATA_PROCESSED, active_weights, load_config
+from flood.config import DATA_PROCESSED, MANIFEST, ROOT, active_weights, load_config
 
 CFG = load_config()
 
@@ -21,6 +21,19 @@ def test_weights_sum_to_one_without_landcover():
 
 def test_factor_directions_valid():
     assert all(f["direction"] in {"low", "high"} for f in CFG["factors"].values())
+
+
+@pytest.mark.skipif(not MANIFEST.exists(), reason="run scripts/01_download_data.py first")
+def test_manifest_complete():
+    """ToR §9: every raw file has a source, licence, date and checksum."""
+    import csv
+    with open(MANIFEST, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    assert rows
+    for r in rows:
+        for field in ("url", "source", "licence", "downloaded_utc", "sha256"):
+            assert r[field], f"{r['file']} is missing {field}"
+        assert (ROOT / r["file"]).exists(), f"{r['file']} listed but not on disk"
 
 
 @pytest.mark.skipif(not (DATA_PROCESSED / "study_area.gpkg").exists(),

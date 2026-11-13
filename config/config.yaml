@@ -26,6 +26,38 @@ study_area:
   gap_closing_m: 3000          # fills the Tanbi Wetland gap left by ADM2 units (Plan §5.3)
   hydrology_buffer_m: 2000     # avoid edge effects in flow routing (Plan §4)
 
+# --- Data sources (ToR §4; Plan §5.1, §6, §7; checked 12 Nov 2026) ------------
+# Cloud-optimised rasters are read remotely and clipped to the hydrology buffer
+# (+ margin), so only the study-area window is downloaded.
+data:
+  clip_margin_deg: 0.05            # about 5.5 km, one CHIRPS pixel
+  dem_primary: fabdem              # fabdem | copernicus (Plan §5.1)
+  fabdem:
+    url: /vsizip//vsicurl/https://data.bris.ac.uk/datasets/s5hqmjcdj8yo2ibzi9b4ew3sn/N10W020-N20W010_FABDEM_V1-2.zip/N13W017_FABDEM_V1-2.tif
+    source: FABDEM V1-2, Hawker et al. (2022), University of Bristol
+    licence: CC BY-NC-SA 4.0
+  copernicus:
+    url: /vsicurl/https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N13_00_W017_00_DEM/Copernicus_DSM_COG_10_N13_00_W017_00_DEM.tif
+    source: Copernicus DEM GLO-30, (c) DLR e.V. 2010-2014 and (c) Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA
+    licence: Copernicus DEM licence (free use with attribution)
+  worldcover:
+    url: /vsicurl/https://esa-worldcover.s3.eu-central-1.amazonaws.com/v200/2021/map/ESA_WorldCover_10m_2021_v200_N12W018_Map.tif
+    source: ESA WorldCover 10 m 2021 v200, Zanaga et al. (2022)
+    licence: CC BY 4.0
+  osm:
+    url: https://download.geofabrik.de/africa/senegal-and-gambia-latest.osm.pbf
+    source: OpenStreetMap contributors, extract by Geofabrik GmbH
+    licence: ODbL 1.0
+  chirps:
+    monthly_url: https://data.chc.ucsb.edu/products/CHIRPS/v3.0/monthly/global/cogs/chirps-v3.0.{year}.{month:02d}.cog
+    daily_url: https://data.chc.ucsb.edu/products/CHIRPS/v3.0/daily/final/{variant}/{year}/chirps-v3.0.{variant}.{year}.{month:02d}.{day:02d}.tif
+    daily_variant: sat             # IMERG timing (rnl = ERA5 timing)
+    monthly_years: [1991, 2025]    # complete years only
+    nodata: -9999                  # present in files but not declared
+    request_pause_s: 10            # server rate-limits (HTTP 429); be gentle
+    source: CHIRPS v3.0, Climate Hazards Center UCSB; Funk et al. (2026) Sci Data 13, 718
+    licence: Public domain (CC waiver); CC BY 4.0 attribution requested
+
 # --- Coordinate systems (Plan §4) ---------------------------------------------
 crs:
   processing: EPSG:32628       # WGS 84 / UTM zone 28N, metres
@@ -59,4 +91,5 @@ classification:
 rainfall:
   climatology_years: [1991, 2020]
   example_season_year: 2022
+  example_season_months: [6, 10]   # June to October wet season
   heavy_rain_mm_per_day: 50    # to be justified from CHIRPS percentiles
