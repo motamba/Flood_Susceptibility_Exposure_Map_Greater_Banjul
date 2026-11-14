@@ -80,3 +80,33 @@ def test_normalised_factors_in_range():
             a = src.read(1, masked=True)
         assert a.count() > 0, name
         assert 0 <= a.min() and a.max() <= 1, name
+
+
+def test_weighted_jenks_matches_mapclassify():
+    """Plan §5.4: the fast weighted Jenks gives the same breaks as the reference."""
+    import mapclassify
+    import numpy as np
+    from flood.model import jenks_weighted
+    rng = np.random.default_rng(1)
+    x = np.round(np.concatenate([rng.normal(0.3, .05, 300), rng.normal(0.6, .05, 200),
+                                 rng.normal(0.85, .03, 100)]), 2)
+    u, c = np.unique(x, return_counts=True)
+    ours = [u[e] for e in jenks_weighted(u, c.astype(float), 3)]
+    ref = list(mapclassify.FisherJenks(x, k=3).bins[:-1])
+    assert np.allclose(ours, ref)
+
+
+@pytest.mark.skipif(not (DATA_PROCESSED / "susceptibility_classes.tif").exists(),
+                    reason="run scripts/04_overlay_classify.py first")
+def test_susceptibility_outputs():
+    """ToR §5 steps 4 and 6: index in 0-1; three classes; web file in budget."""
+    import rasterio
+    with rasterio.open(DATA_PROCESSED / "susceptibility_index.tif") as src:
+        idx = src.read(1, masked=True)
+    assert 0 <= idx.min() and idx.max() <= 1
+    with rasterio.open(DATA_PROCESSED / "susceptibility_classes.tif") as src:
+        cls = src.read(1, masked=True)
+    assert set(cls.compressed().tolist()) == {1, 2, 3}
+    web = ROOT / "docs" / "data"
+    total = sum(p.stat().st_size for p in web.glob("*.geojson"))
+    assert total < 5 * 1024 * 1024, "web data over the 5 MB budget (Plan §9)"

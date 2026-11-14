@@ -29,7 +29,9 @@ const LAYERS = [
       },
     }],
     legend: { title: "Susceptibility", items: Object.entries(SUSC_COLOURS).map(([k, c]) => ({ label: k, colour: c })) },
-    popup: (p) => `<h4>${p.class} susceptibility</h4>`,
+    popup: (p) => `<div class="popup"><h4>${p.class} susceptibility</h4><table>
+      <tr><td>Class area</td><td>${Number(p.area_km2).toFixed(1)} km² in the study area</td></tr></table>
+      <p class="small">Relative index from terrain and land cover, not a flood forecast.</p></div>`,
   },
   {
     id: "water", label: "Water and wetland", pending: "Day 4", visible: true,

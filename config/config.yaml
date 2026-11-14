@@ -108,8 +108,7 @@ classification:
   method: jenks                # jenks | quantiles
   n_classes: 3
   labels: [Low, Medium, High]
-  jenks_sample_size: 50000
-  random_seed: 42
+  jenks_precision: 0.001       # index rounded before exact Jenks on all cells
 
 # --- Rainfall (Plan §7) -------------------------------------------------------
 rainfall:

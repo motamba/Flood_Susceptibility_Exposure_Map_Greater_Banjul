@@ -65,6 +65,35 @@ Every factor is scaled to 0–1, with 1 meaning more susceptible. Open water is 
 
 ![Factors](outputs/figures/factors.png)
 
+### Weighted overlay and classes (`scripts/04_overlay_classify.py`)
+
+- **Index:** S = 0.30·HAND + 0.20·elevation + 0.20·depression depth + 0.15·TWI + 0.15·land cover. It is computed on the 295,611 land cells of the study area (266 km²) and ranges from 0.04 to 0.99 (median 0.48).
+- **Why these weights:**
+  - HAND gets the most weight because height above the nearest drainage is the most direct terrain indicator of where water collects.
+  - Elevation and depression depth together cover coastal lowness and ponding, the dominant flood types in Banjul.
+  - TWI and land cover adjust for flow convergence and for sealed surfaces.
+- **Classes:** three classes from exact Jenks natural breaks (Fisher's algorithm) on **all** land cells. The index is first rounded to 0.001, so the algorithm runs on about 1000 distinct values weighted by their cell counts. A test confirms this gives the same breaks as `mapclassify.FisherJenks`. Jenks was chosen over quantiles because it places breaks at natural gaps in the data instead of forcing a third of the land into each class. The two methods agree on 87% of cells.
+
+| Class | Index range | Area | Share of land |
+|---|---|---|---|
+| Low | < 0.365 | 61.1 km² | 23.0% |
+| Medium | 0.365–0.536 | 109.4 km² | 41.1% |
+| High | > 0.536 | 95.5 km² | 35.9% |
+
+The High class includes most of the 47 km² of Tanbi wetland and mangrove, which is wet by nature. The exposure analysis shows where High overlaps with buildings and services.
+
+![Susceptibility](outputs/figures/susceptibility.png)
+
+### Sensitivity of the weights (`scripts/05_sensitivity.py`)
+
+The model was re-run, with index and classes, for 11 alternative weightings: equal weights; each factor +0.10 (others reduced proportionally); and each factor dropped. The High class of each run is compared with the baseline using the Jaccard overlap (shared cells ÷ cells in either). Full results: [sensitivity.csv](outputs/tables/sensitivity.csv).
+
+- **Robust to moderate changes:** every "+0.10" scenario and equal weights keep 0.80–0.94 overlap, and the High area stays between 81 and 109 km².
+- **Elevation matters most:** dropping it gives the lowest overlap (0.57). Dropping HAND (0.71) or land cover (0.73) has a moderate effect.
+- **Depression depth has little influence** despite its 0.20 weight: dropping it leaves 0.94 overlap. It is zero on 98% of cells, so it acts as a local flag for distinct hollows rather than shaping the overall pattern.
+
+![Sensitivity](outputs/figures/sensitivity.png)
+
 ## Reproduce
 
 ```bash
