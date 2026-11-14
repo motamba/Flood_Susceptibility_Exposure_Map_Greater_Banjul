@@ -7,14 +7,16 @@ Each layer is exported only if its processed source exists, so the web map
 can be tested while later steps (susceptibility, exposure, rainfall) are
 still being built. The map shows missing layers as "pending".
 
-Outputs: docs/data/*.geojson and docs/data/meta.json
+Outputs: docs/data/*.geojson, docs/data/exposure.json (tables for the
+Exposure tab) and docs/data/meta.json
 """
 import json
 from datetime import datetime, timezone
 
 import geopandas as gpd
+import pandas as pd
 
-from flood.config import DATA_PROCESSED, WEB_DATA, ensure_dirs, load_config
+from flood.config import DATA_PROCESSED, TABLES, WEB_DATA, ensure_dirs, load_config
 
 PRECISION = 5  # decimal degrees, about 1 m (Plan §9 performance budget)
 
@@ -25,9 +27,11 @@ LAYERS = [
     # Added on later days (Plan §11):
     ("susceptibility", "susceptibility_classes.gpkg", None, ["class", "area_km2"]),  # Day 5
     ("water", "water_mask.gpkg", None, ["type", "area_km2"]),                  # Day 4
-    ("facilities", "facilities_exposed.gpkg", None, None),                     # Day 6
-    ("reported_floods", "reported_floods.gpkg", None, None),                   # Day 6
+    ("facilities", "facilities_exposed.gpkg", None, ["name", "type", "kind", "class", "district"]),
+    ("reported_floods", "reported_floods.gpkg", None,
+     ["id", "place", "event_date", "source_title", "source_url", "class"]),
 ]
+
 
 
 def main() -> None:
@@ -51,6 +55,24 @@ def main() -> None:
         )
         exported[out_name] = out.name
         print(f"[ok] {out_name}: {len(gdf)} features, {out.stat().st_size / 1024:.0f} KB")
+
+    # Exposure tab: the summary tables of steps 6 and 8 (Plan §9 side panel).
+    if (TABLES / "exposure.csv").exists():
+        exp = pd.read_csv(TABLES / "exposure.csv")
+        tables = {
+            "osm_data_as_of": str(exp["osm_data_as_of"].iloc[0]),
+            "classes": cfg["classification"]["labels"],
+            "exposure": exp.drop(columns="osm_data_as_of").to_dict(orient="records"),
+        }
+        if (TABLES / "exposure_by_council.csv").exists():
+            tables["by_council"] = pd.read_csv(TABLES / "exposure_by_council.csv").to_dict(orient="records")
+        if (TABLES / "plausibility.csv").exists():
+            text = (TABLES / "plausibility.csv").read_text(encoding="utf-8").split("\n\n")
+            summary = pd.read_csv(pd.io.common.StringIO(text[1]))
+            tables["plausibility"] = dict(zip(summary["measure"], summary["value"]))
+        (WEB_DATA / "exposure.json").write_text(json.dumps(tables, indent=1), encoding="utf-8")
+        exported["exposure_tables"] = "exposure.json"
+        print("[ok] exposure tables")
 
     meta = {
         "built_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),

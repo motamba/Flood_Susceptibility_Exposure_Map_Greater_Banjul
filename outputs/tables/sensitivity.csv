@@ -1,13 +1,13 @@
-scenario,change,w_hand,w_elevation,w_depression_depth,w_twi,w_landcover,high_km2,high_pct_land,jaccard_vs_S0,verdict
-S0,baseline,0.3,0.2,0.2,0.15,0.15,95.5,35.9,1.0,robust
-S1,equal weights,0.2,0.2,0.2,0.2,0.2,86.5,32.5,0.866,robust
-S2,hand +0.10,0.4,0.171,0.171,0.129,0.129,108.6,40.8,0.86,robust
-S3,elevation +0.10,0.262,0.3,0.175,0.131,0.131,86.5,32.5,0.831,robust
-S4,depression_depth +0.10,0.262,0.175,0.3,0.131,0.131,90.5,34.0,0.942,robust
-S5,twi +0.10,0.265,0.176,0.176,0.25,0.132,80.8,30.4,0.799,moderate
-S6,landcover +0.10,0.265,0.176,0.176,0.132,0.25,99.1,37.2,0.82,robust
-S7,drop hand,0.0,0.286,0.286,0.214,0.214,82.4,31.0,0.711,moderate
-S8,drop elevation,0.375,0.0,0.25,0.187,0.187,90.4,34.0,0.57,sensitive
-S9,drop depression_depth,0.375,0.25,0.0,0.187,0.187,99.4,37.3,0.938,robust
-S10,drop twi,0.353,0.235,0.235,0.0,0.176,91.8,34.5,0.819,robust
-S11,drop landcover,0.353,0.235,0.235,0.176,0.0,93.1,35.0,0.733,moderate
+scenario,change,w_hand,w_elevation,w_depression_depth,w_twi,w_landcover,high_km2,high_pct_land,jaccard_vs_S0,verdict,buildings_high_pct
+S0,baseline,0.3,0.2,0.2,0.15,0.15,95.5,35.9,1.0,robust,33.6
+S1,equal weights,0.2,0.2,0.2,0.2,0.2,86.5,32.5,0.866,robust,32.1
+S2,hand +0.10,0.4,0.171,0.171,0.129,0.129,108.6,40.8,0.86,robust,38.8
+S3,elevation +0.10,0.262,0.3,0.175,0.131,0.131,86.5,32.5,0.831,robust,25.2
+S4,depression_depth +0.10,0.262,0.175,0.3,0.131,0.131,90.5,34.0,0.942,robust,31.0
+S5,twi +0.10,0.265,0.176,0.176,0.25,0.132,80.8,30.4,0.799,moderate,28.0
+S6,landcover +0.10,0.265,0.176,0.176,0.132,0.25,99.1,37.2,0.82,robust,42.4
+S7,drop hand,0.0,0.286,0.286,0.214,0.214,82.4,31.0,0.711,moderate,28.7
+S8,drop elevation,0.375,0.0,0.25,0.187,0.187,90.4,34.0,0.57,sensitive,43.0
+S9,drop depression_depth,0.375,0.25,0.0,0.187,0.187,99.4,37.3,0.938,robust,36.0
+S10,drop twi,0.353,0.235,0.235,0.0,0.176,91.8,34.5,0.819,robust,32.8
+S11,drop landcover,0.353,0.235,0.235,0.176,0.0,93.1,35.0,0.733,moderate,23.3

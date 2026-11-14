@@ -1,10 +1,13 @@
 {
-  "built_utc": "2026-11-13 18:14 UTC",
+  "built_utc": "2026-11-14 11:15 UTC",
   "disclaimer": "Susceptibility index for illustration and learning, not a validated flood forecast. Do not use for planning or safety decisions.",
   "layers": {
     "study_area": "study_area.geojson",
     "units": "units.geojson",
     "susceptibility": "susceptibility.geojson",
-    "water": "water.geojson"
+    "water": "water.geojson",
+    "facilities": "facilities.geojson",
+    "reported_floods": "reported_floods.geojson",
+    "exposure_tables": "exposure.json"
   }
 }

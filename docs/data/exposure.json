@@ -1,0 +1,123 @@
+{
+ "osm_data_as_of": "2026-11-11T21:22:47Z",
+ "classes": [
+  "Low",
+  "Medium",
+  "High"
+ ],
+ "exposure": [
+  {
+   "asset": "Land area",
+   "unit": "km2",
+   "Low": 61.1,
+   "Low_pct": 23.0,
+   "Medium": 109.4,
+   "Medium_pct": 41.1,
+   "High": 95.5,
+   "High_pct": 35.9,
+   "Unclassified": 0.0,
+   "Unclassified_pct": 0.0,
+   "Total": 266.0
+  },
+  {
+   "asset": "Buildings",
+   "unit": "count",
+   "Low": 19927.0,
+   "Low_pct": 17.9,
+   "Medium": 54031.0,
+   "Medium_pct": 48.5,
+   "High": 37439.0,
+   "High_pct": 33.6,
+   "Unclassified": 21.0,
+   "Unclassified_pct": 0.0,
+   "Total": 111418.0
+  },
+  {
+   "asset": "Roads (all)",
+   "unit": "km",
+   "Low": 736.3,
+   "Low_pct": 22.2,
+   "Medium": 1663.3,
+   "Medium_pct": 50.1,
+   "High": 919.1,
+   "High_pct": 27.7,
+   "Unclassified": 4.2,
+   "Unclassified_pct": 0.1,
+   "Total": 3322.9
+  },
+  {
+   "asset": "Roads (vehicle)",
+   "unit": "km",
+   "Low": 689.4,
+   "Low_pct": 21.6,
+   "Medium": 1608.4,
+   "Medium_pct": 50.4,
+   "High": 889.7,
+   "High_pct": 27.9,
+   "Unclassified": 3.7,
+   "Unclassified_pct": 0.1,
+   "Total": 3191.2
+  },
+  {
+   "asset": "Schools",
+   "unit": "count",
+   "Low": 26.0,
+   "Low_pct": 28.0,
+   "Medium": 42.0,
+   "Medium_pct": 45.2,
+   "High": 25.0,
+   "High_pct": 26.9,
+   "Unclassified": 0.0,
+   "Unclassified_pct": 0.0,
+   "Total": 93.0
+  },
+  {
+   "asset": "Health facilities",
+   "unit": "count",
+   "Low": 8.0,
+   "Low_pct": 28.6,
+   "Medium": 16.0,
+   "Medium_pct": 57.1,
+   "High": 4.0,
+   "High_pct": 14.3,
+   "Unclassified": 0.0,
+   "Unclassified_pct": 0.0,
+   "Total": 28.0
+  }
+ ],
+ "by_council": [
+  {
+   "council": "banjul",
+   "buildings": 3285,
+   "buildings_high": 3172,
+   "buildings_high_pct": 96.6,
+   "schools_high": 7,
+   "health_high": 2
+  },
+  {
+   "council": "kanifing",
+   "buildings": 40662,
+   "buildings_high": 14951,
+   "buildings_high_pct": 36.8,
+   "schools_high": 7,
+   "health_high": 1
+  },
+  {
+   "council": "kombo_north",
+   "buildings": 67451,
+   "buildings_high": 19312,
+   "buildings_high_pct": 28.6,
+   "schools_high": 11,
+   "health_high": 1
+  }
+ ],
+ "plausibility": {
+  "points": 8.0,
+  "share of points in High": 0.62,
+  "share of land in High": 0.36,
+  "share of points in High or Medium": 1.0,
+  "share of land in High or Medium": 0.77,
+  "mean High share within radius": 0.66,
+  "ratio High points / High land": 1.74
+ }
+}

@@ -1,0 +1,15 @@
+{
+"type": "FeatureCollection",
+"name": "reported_floods",
+"xy_coordinate_resolution": 1e-05,
+"features": [
+{"type":"Feature","properties":{"id":"R1","place":"Ebo Town","event_date":"2022-07-31","source_title":"VP affirms resettlement as flooding renders many homeless (The Point)","source_url":"https://thepoint.gm/africa/gambia/headlines/vp-affirms-resettlement-as-flooding-renders-many-homeless","class":"High"},"geometry":{"type":"Point","coordinates":[-16.66801,13.43659]}},
+{"type":"Feature","properties":{"id":"R2","place":"Tallinding","event_date":"2022-07-31","source_title":"VP affirms resettlement as flooding renders many homeless (The Point)","source_url":"https://thepoint.gm/africa/gambia/headlines/vp-affirms-resettlement-as-flooding-renders-many-homeless","class":"Medium"},"geometry":{"type":"Point","coordinates":[-16.67222,13.42594]}},
+{"type":"Feature","properties":{"id":"R3","place":"Kotu-Latrikunda bridge (Kotu Creek)","event_date":"2022-07-31","source_title":"Nonstop downpour causes widespread floods (The Alkamba Times)","source_url":"https://alkambatimes.com/nonstop-downpour-causes-widespread-floods/","class":"High"},"geometry":{"type":"Point","coordinates":[-16.68657,13.45143]}},
+{"type":"Feature","properties":{"id":"R4","place":"Manjai bridge (Kotu Creek)","event_date":"2022-07-31","source_title":"Heavy rain causes flood in some parts of Gambia (Kerr Fatou)","source_url":"https://www.kerrfatou.com/heavy-rain-causes-flood-in-some-parts-of-gambia/","class":"High"},"geometry":{"type":"Point","coordinates":[-16.69008,13.44287]}},
+{"type":"Feature","properties":{"id":"R5","place":"Brufut","event_date":"2022-07-31","source_title":"Heavy rain causes flood in some parts of Gambia (Kerr Fatou)","source_url":"https://www.kerrfatou.com/heavy-rain-causes-flood-in-some-parts-of-gambia/","class":"High"},"geometry":{"type":"Point","coordinates":[-16.75173,13.38134]}},
+{"type":"Feature","properties":{"id":"R6","place":"Latrikunda Sabiji market (ward)","event_date":"2022-06","source_title":"KMC explains Latrikunda Sabiji market flooding (Voice Gambia)","source_url":"https://www.voicegambia.com/2022/06/28/kmc-explains-latrikunda-sabiji-market-flooding/","class":"Medium"},"geometry":{"type":"Point","coordinates":[-16.67338,13.41114]}},
+{"type":"Feature","properties":{"id":"R7","place":"Bundung-Sukuta bridge (Kotu Creek)","event_date":"2025-06-28","source_title":"Tragic loss in Bundung (The Alkamba Times)","source_url":"https://alkambatimes.com/tragic-loss-in-bundung-4-year-old-boys-body-recovered-after-flood-swept-him-away/","class":"High"},"geometry":{"type":"Point","coordinates":[-16.6911,13.42884]}},
+{"type":"Feature","properties":{"id":"R8","place":"Banjul","event_date":"2026-08-05","source_title":"Banjul families demand action after flash flood (The Point)","source_url":"https://thepoint.gm/africa/gambia/headlines/banjul-families-demand-action-after-flash-flood","class":"Medium"},"geometry":{"type":"Point","coordinates":[-16.57565,13.45535]}}
+]
+}

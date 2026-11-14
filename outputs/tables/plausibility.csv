@@ -1,0 +1,18 @@
+id,place,osm_ref,precision,event_date,source_title,source_url,source_date,radius_m,low_share_radius,medium_share_radius,high_share_radius,class_at_point,code,class
+R1,Ebo Town,node/2561179210,settlement,2022-07-31,VP affirms resettlement as flooding renders many homeless (The Point),https://thepoint.gm/africa/gambia/headlines/vp-affirms-resettlement-as-flooding-renders-many-homeless,2022-08-01,300,0.0,0.0,1.0,High,3,High
+R2,Tallinding,node/3737379911,settlement,2022-07-31,VP affirms resettlement as flooding renders many homeless (The Point),https://thepoint.gm/africa/gambia/headlines/vp-affirms-resettlement-as-flooding-renders-many-homeless,2022-08-01,300,0.25,0.75,0.0,Medium,2,Medium
+R3,Kotu-Latrikunda bridge (Kotu Creek),way/679765048,feature,2022-07-31,Nonstop downpour causes widespread floods (The Alkamba Times),https://alkambatimes.com/nonstop-downpour-causes-widespread-floods/,2022-07-31,100,0.0,0.19,0.81,High,3,High
+R4,Manjai bridge (Kotu Creek),way/772792663,feature,2022-07-31,Heavy rain causes flood in some parts of Gambia (Kerr Fatou),https://www.kerrfatou.com/heavy-rain-causes-flood-in-some-parts-of-gambia/,2022-07-31,100,0.0,0.08,0.92,High,3,High
+R5,Brufut,node/326410655,settlement,2022-07-31,Heavy rain causes flood in some parts of Gambia (Kerr Fatou),https://www.kerrfatou.com/heavy-rain-causes-flood-in-some-parts-of-gambia/,2022-07-31,300,0.0,0.44,0.56,High,3,High
+R6,Latrikunda Sabiji market (ward),way/1312474407,ward,2022-06,KMC explains Latrikunda Sabiji market flooding (Voice Gambia),https://www.voicegambia.com/2022/06/28/kmc-explains-latrikunda-sabiji-market-flooding/,2022-06-28,300,0.19,0.68,0.14,Medium,2,Medium
+R7,Bundung-Sukuta bridge (Kotu Creek),way/938794557,feature,2025-06-28,Tragic loss in Bundung (The Alkamba Times),https://alkambatimes.com/tragic-loss-in-bundung-4-year-old-boys-body-recovered-after-flood-swept-him-away/,2025-06-29,100,0.0,0.0,1.0,High,3,High
+R8,Banjul,node/249167555,settlement,2026-08-05,Banjul families demand action after flash flood (The Point),https://thepoint.gm/africa/gambia/headlines/banjul-families-demand-action-after-flash-flood,2026-08-07,300,0.0,0.17,0.83,Medium,2,Medium
+
+measure,value
+points,8.0
+share of points in High,0.62
+share of land in High,0.36
+share of points in High or Medium,1.0
+share of land in High or Medium,0.77
+mean High share within radius,0.66
+ratio High points / High land,1.74

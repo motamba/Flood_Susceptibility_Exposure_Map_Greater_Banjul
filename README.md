@@ -28,6 +28,7 @@ All sources were checked on 12 November 2026. Rasters are read remotely and clip
 | Buildings, roads, facilities, water | © OpenStreetMap contributors, extract by Geofabrik | data as of 11 Nov 2026 | ODbL 1.0 | Exposure, drainage |
 | Rainfall | CHIRPS v3.0, Climate Hazards Center, UCSB (Funk et al., 2026, *Sci Data* 13, 718) | 0.05° (≈5.5 km); monthly 1991-2025; daily Jun-Oct 2022 | Public domain (CC waiver); attribution requested | Rainfall context |
 | Boundaries | geoBoundaries gbOpen GMB ADM2 | 2020 | CC BY 4.0 | Study area |
+| Reported flood places | Gambian news reports (The Point, The Alkamba Times, Kerr Fatou, Voice Gambia), listed with quotes and URLs in [`config/reported_floods.csv`](config/reported_floods.csv) | 2022–2026 events | Cited, not copied | Plausibility check |
 
 **Note on daily rainfall:** CHIRPS v3 daily values are not an independent daily product. They are 5-day (pentadal) totals spread across days using IMERG satellite timing (the `sat` variant). Daily peaks therefore show the timing only approximately; monthly totals are more reliable.
 
@@ -93,6 +94,46 @@ The model was re-run, with index and classes, for 11 alternative weightings: equ
 - **Depression depth has little influence** despite its 0.20 weight: dropping it leaves 0.94 overlap. It is zero on 98% of cells, so it acts as a local flag for distinct hollows rather than shaping the overall pattern.
 
 ![Sensitivity](outputs/figures/sensitivity.png)
+
+**Effect on exposure:** the share of buildings in the High class varies more than the High area does: 23% to 43% across scenarios (baseline 34%). Most buildings stand on low, gently sloping land near the class boundary, so changing the elevation or land-cover weight moves many of them between Medium and High. Exposure counts should therefore be read as an order of magnitude, not exact figures.
+
+### Exposure (`scripts/06_exposure.py`)
+
+OSM buildings, roads, schools and health facilities inside the study area were assigned to the class of the 30 m cell they lie in. Buildings and facilities are counted by a point inside each footprint. Roads are clipped by the class polygons and measured in km. "Vehicle roads" leave out footpaths, paths, steps and tracks. Health facilities are hospitals, clinics, doctors and other `healthcare=*` features, but not pharmacies. A facility mapped both as a point and as a polygon with the same name within 50 m is counted once. Full table: [exposure.csv](outputs/tables/exposure.csv).
+
+| Asset (OSM, 11 Nov 2026) | In High | Share in High | Total |
+|---|---|---|---|
+| *Land area (reference)* | *95.5 km²* | *36%* | *266 km²* |
+| Buildings | 37,439 | 34% | 111,418 |
+| Vehicle roads | 890 km | 28% | 3,191 km |
+| Schools | 25 | 27% | 93 |
+| Health facilities | 4 | 14% | 28 |
+
+- **Banjul is almost entirely exposed:** 97% of its buildings are in the High class, compared with 37% in Kanifing and 29% in Kombo North ([by council](outputs/tables/exposure_by_council.csv)).
+- **Buildings and services are slightly less exposed than the land as a whole.** Most settlements sit on the higher ground between valleys, and the High class also covers undeveloped wetland. Schools and health facilities, which are often on planned sites, show this most clearly.
+- **These are minimum counts.** OSM coverage is incomplete, especially for facilities, and building footprints are traced from imagery of different dates.
+
+![Exposure](outputs/figures/exposure.png)
+
+### Plausibility check (`scripts/08_plausibility.py`)
+
+There is no flood map to validate against, so the map was compared with places that news reports name as flooded. Eight places in the study area could be identified and located from Gambian news reports of the July 2022 floods (276 mm at Banjul airport on 30–31 July), a June 2025 flood and the August 2026 Banjul flood. Each place is located with an OSM feature in the local extract (a settlement point, a ward or a bridge). The quotes and source URLs are in [`config/reported_floods.csv`](config/reported_floods.csv).
+
+| Measure | Value |
+|---|---|
+| Reported places in High | 5 of 8 (62%), while High covers 36% of land |
+| Reported places in High or Medium | 8 of 8, while High + Medium cover 77% of land |
+| Mean share of High within 100–300 m of each place | 66% |
+
+**Where the map agrees:** Ebo Town, Brufut and the three bridges over Kotu Creek (Kotu–Latrikunda, Manjai, Bundung–Sukuta) are all High. The creek valley is the clearest flood corridor in the model.
+
+**Where it does not:**
+- **Banjul** (Medium at the city point, but 83% High within 300 m). The OSM point for the city sits on a slightly higher street. The surrounding city is High.
+- **Tallinding** and the **Latrikunda Sabiji market** (Medium, little High nearby). The reports blame blocked drains and houses built on waterways. Blocked drains are not visible in a 30 m terrain model. The DEM also smooths the small channels that run through these dense neighbourhoods.
+
+With only 8 points, this is a check that the map is plausible, not a validation. Settlement points are approximate, and news coverage favours places that are easy for reporters to reach.
+
+![Plausibility](outputs/figures/plausibility.png)
 
 ## Reproduce
 

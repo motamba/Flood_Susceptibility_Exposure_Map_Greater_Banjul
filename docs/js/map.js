@@ -77,16 +77,64 @@ const LAYERS = [
     legend: { title: "Facilities", items: [
       { label: "School", colour: "#2c7fb8", kind: "dot" },
       { label: "Health facility", colour: "#d7301f", kind: "dot" }] },
-    popup: (p) => `<div class="popup"><h4>${p.name || "Unnamed"}</h4><table>
-      <tr><td>Type</td><td>${p.type}</td></tr>
-      <tr><td>Susceptibility</td><td>${p.class}</td></tr></table></div>`,
+    popup: (p) => `<div class="popup"><h4>${esc(p.name) || "Unnamed " + (p.type === "school" ? "school" : "health facility")}</h4><table>
+      <tr><td>Type</td><td>${esc(p.kind)}</td></tr>
+      <tr><td>District</td><td>${esc(p.district) || "–"}</td></tr>
+      <tr><td>Susceptibility</td><td><b>${p.class}</b></td></tr></table>
+      <p class="small">Source: © OpenStreetMap contributors</p></div>`,
   },
   {
     id: "reported_floods", label: "Reported flood locations", pending: "Day 6", visible: false,
     layers: [{ type: "circle", paint: { "circle-radius": 6, "circle-color": "#6a3d9a", "circle-stroke-color": "#fff", "circle-stroke-width": 1 } }],
-    legend: { title: "Plausibility", items: [{ label: "Reported flood location", colour: "#6a3d9a", kind: "dot" }] },
+    legend: { title: "Plausibility", items: [{ label: "Reported flood location (news)", colour: "#6a3d9a", kind: "dot" }] },
+    popup: (p) => `<div class="popup"><h4>${p.id} ${esc(p.place)}</h4><table>
+      <tr><td>Reported</td><td>${esc(p.event_date)}</td></tr>
+      <tr><td>Map class</td><td><b>${p.class}</b></td></tr></table>
+      <p class="small"><a href="${encodeURI(p.source_url)}" target="_blank" rel="noopener">${esc(p.source_title)}</a></p></div>`,
   },
 ];
+
+// Escape text from data files before inserting it as HTML (OSM names, news titles).
+function esc(v) {
+  if (v === null || v === undefined || v === "null") return "";
+  return String(v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+}
+
+const fmt = (v, unit) => (unit === "count" ? Math.round(v).toLocaleString("en-GB")
+  : Number(v).toLocaleString("en-GB", { maximumFractionDigits: unit === "km" ? 0 : 1 }));
+
+async function buildExposure(file) {
+  const box = document.getElementById("exposure-body");
+  let t;
+  try {
+    t = await (await fetch(`data/${file}`, { cache: "no-store" })).json();
+  } catch {
+    return;
+  }
+  const units = { km2: "km²", km: "km", count: "" };
+  const rows = t.exposure.map((r) => {
+    const ref = r.asset === "Land area";
+    return `<tr class="${ref ? "ref" : ""}"><td>${r.asset}${units[r.unit] ? ` (${units[r.unit]})` : ""}</td>
+      <td class="high">${fmt(r.High, r.unit)}</td><td class="high">${r.High_pct.toFixed(0)}%</td>
+      <td>${fmt(r.Total, r.unit)}</td></tr>`;
+  }).join("");
+  const councils = { banjul: "Banjul", kanifing: "Kanifing", kombo_north: "Kombo North" };
+  const byCouncil = (t.by_council || []).map((r) => `<tr><td>${councils[r.council] || r.council}</td>
+      <td class="high">${r.buildings_high.toLocaleString("en-GB")}</td><td class="high">${r.buildings_high_pct.toFixed(0)}%</td>
+      <td>${r.schools_high}</td><td>${r.health_high}</td></tr>`).join("");
+  const p = t.plausibility;
+  box.innerHTML = `
+    <p>Assets inside the <b>High</b> susceptibility class. The land-area row is the reference: an asset type is over-exposed when its share is above it.</p>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Asset</th><th>In High</th><th>Share</th><th>Total</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>
+    ${byCouncil ? `<h2>High class by council</h2><div class="table-wrap"><table class="data-table">
+      <thead><tr><th>Council</th><th>Buildings</th><th>Share</th><th>Schools</th><th>Health</th></tr></thead>
+      <tbody>${byCouncil}</tbody></table></div>` : ""}
+    ${p ? `<h2>Plausibility check</h2>
+      <p>${Math.round(p["share of points in High"] * p.points)} of ${p.points} places reported as flooded in the news (2022–2026) lie in the High class, which covers ${Math.round(p["share of land in High"] * 100)}% of the land. All ${p.points} lie in High or Medium. Too few points to prove skill, but consistent with the map. Turn on <i>Reported flood locations</i> in the Layers tab.</p>` : ""}
+    <p class="small">OSM data as of ${t.osm_data_as_of.slice(0, 10)}. Roads exclude footpaths and tracks.</p>`;
+}
 
 // Fallback basemap if the OpenFreeMap style cannot be loaded.
 const FALLBACK_STYLE = {
@@ -217,6 +265,7 @@ map.on("load", async () => {
     if (available[def.id]) addLayer(def, available[def.id]);
   }
   buildLayerList(available);
+  if (available.exposure_tables) buildExposure(available.exposure_tables);
   buildLegend(available);
   fitToStudyArea();
   if (meta.built_utc) document.getElementById("built").textContent = meta.built_utc;

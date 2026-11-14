@@ -110,3 +110,36 @@ def test_susceptibility_outputs():
     web = ROOT / "docs" / "data"
     total = sum(p.stat().st_size for p in web.glob("*.geojson"))
     assert total < 5 * 1024 * 1024, "web data over the 5 MB budget (Plan §9)"
+
+
+TABLES = ROOT / "outputs" / "tables"
+DATA_INTERIM_EXPOSURE = ROOT / "data" / "interim" / "exposure"
+
+
+@pytest.mark.skipif(not (TABLES / "exposure.csv").exists(), reason="run scripts/06_exposure.py first")
+def test_exposure_table_consistent():
+    """ToR §5 step 7: per-class counts add up to the total; shares to 100%."""
+    import numpy as np
+    import pandas as pd
+    t = pd.read_csv(TABLES / "exposure.csv")
+    assert {"Buildings", "Roads (all)", "Schools", "Health facilities"} <= set(t.asset)
+    classes = CFG["classification"]["labels"] + ["Unclassified"]
+    assert np.allclose(t[classes].sum(axis=1), t["Total"], atol=0.5)
+    assert np.allclose(t[[f"{c}_pct" for c in classes]].sum(axis=1), 100, atol=0.5)
+    roads = t.set_index("asset")["Total"]
+    assert roads["Roads (vehicle)"] <= roads["Roads (all)"]
+    cells = DATA_INTERIM_EXPOSURE / "building_cells.npy"
+    if cells.exists():
+        assert int(np.load(cells).sum()) == int(roads["Buildings"])
+
+
+@pytest.mark.skipif(not (DATA_PROCESSED / "reported_floods.csv").exists(),
+                    reason="run scripts/08_plausibility.py first")
+def test_reported_floods_sourced_and_inside():
+    """Plan §8: every point has a source URL and a class, and lies in the study area."""
+    import geopandas as gpd
+    pts = gpd.read_file(DATA_PROCESSED / "reported_floods.gpkg")
+    study = gpd.read_file(DATA_PROCESSED / "study_area.gpkg", layer="study_area").union_all()
+    assert pts.source_url.str.startswith("https://").all()
+    assert pts["class"].isin(CFG["classification"]["labels"]).all()
+    assert pts.within(study).all()

@@ -139,3 +139,12 @@ body {
   }
   .panel.collapsed { display: none; }
 }
+
+/* Exposure tab tables */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin: 6px 0 12px; }
+.data-table th, .data-table td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: right; }
+.data-table th:first-child, .data-table td:first-child { text-align: left; }
+.data-table th { font-weight: 600; color: var(--muted); }
+.data-table td.high { font-weight: 600; }
+.data-table tr.ref td { color: var(--muted); font-style: italic; }
+.table-wrap { overflow-x: auto; }
