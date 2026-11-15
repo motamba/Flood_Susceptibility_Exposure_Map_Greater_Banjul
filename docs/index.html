@@ -46,7 +46,9 @@
 
       <section id="tab-rainfall" class="tab-body" role="tabpanel" hidden>
         <h2>Rainfall context</h2>
-        <p class="pending-note">The monthly rainfall climatology and a daily wet-season chart (CHIRPS) will appear here.</p>
+        <div id="rainfall-body">
+          <p class="pending-note">The monthly rainfall climatology and a daily wet-season chart (CHIRPS) will appear here.</p>
+        </div>
       </section>
 
       <section id="tab-about" class="tab-body" role="tabpanel" hidden>
@@ -71,6 +73,7 @@
   </main>
 
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js"></script>
   <script src="js/map.js"></script>
 </body>
 </html>

@@ -148,3 +148,10 @@ body {
 .data-table td.high { font-weight: 600; }
 .data-table tr.ref td { color: var(--muted); font-style: italic; }
 .table-wrap { overflow-x: auto; }
+
+/* Rainfall tab */
+.chart-box { position: relative; height: 190px; margin: 4px 0 2px; }
+.tab-body h3 { font-size: 13px; margin: 14px 0 4px; }
+.callout { background: #f3f6fa; border-left: 3px solid #bd0026; padding: 8px 10px; font-size: 12.5px; margin: 12px 0; }
+details { font-size: 12.5px; margin: 8px 0; }
+details summary { cursor: pointer; color: var(--accent); }

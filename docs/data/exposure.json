@@ -24,9 +24,9 @@
    "unit": "count",
    "Low": 19927.0,
    "Low_pct": 17.9,
-   "Medium": 54031.0,
+   "Medium": 54029.0,
    "Medium_pct": 48.5,
-   "High": 37439.0,
+   "High": 37441.0,
    "High_pct": 33.6,
    "Unclassified": 21.0,
    "Unclassified_pct": 0.0,
@@ -37,9 +37,9 @@
    "unit": "km",
    "Low": 736.3,
    "Low_pct": 22.2,
-   "Medium": 1663.3,
+   "Medium": 1663.2,
    "Medium_pct": 50.1,
-   "High": 919.1,
+   "High": 919.2,
    "High_pct": 27.7,
    "Unclassified": 4.2,
    "Unclassified_pct": 0.1,
@@ -97,7 +97,7 @@
   {
    "council": "kanifing",
    "buildings": 40662,
-   "buildings_high": 14951,
+   "buildings_high": 14952,
    "buildings_high_pct": 36.8,
    "schools_high": 7,
    "health_high": 1
@@ -105,7 +105,7 @@
   {
    "council": "kombo_north",
    "buildings": 67451,
-   "buildings_high": 19312,
+   "buildings_high": 19313,
    "buildings_high_pct": 28.6,
    "schools_high": 11,
    "health_high": 1

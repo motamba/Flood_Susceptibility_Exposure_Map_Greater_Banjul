@@ -143,3 +143,18 @@ def test_reported_floods_sourced_and_inside():
     assert pts.source_url.str.startswith("https://").all()
     assert pts["class"].isin(CFG["classification"]["labels"]).all()
     assert pts.within(study).all()
+
+
+@pytest.mark.skipif(not (DATA_PROCESSED / "rainfall.json").exists(), reason="run scripts/07_rainfall.py first")
+def test_rainfall_series():
+    """Plan §7: 12-month climatology with a June-October wet season; full daily season."""
+    import json
+    r = json.loads((DATA_PROCESSED / "rainfall.json").read_text())
+    clim = r["climatology"]
+    assert len(clim["normal_mm"]) == 12 and all(v >= 0 for v in clim["normal_mm"])
+    assert clim["wet_season_share"] > 0.8          # Sahelian monsoon climate
+    assert 600 < clim["normal_annual_mm"] < 1600   # plausible for the Gambian coast
+    if "daily" in r:
+        m0, m1 = CFG["rainfall"]["example_season_months"]
+        assert len(r["daily"]["mm"]) == len(r["daily"]["dates"]) >= 28 * (m1 - m0 + 1)
+        assert all(v >= 0 for v in r["daily"]["mm"])

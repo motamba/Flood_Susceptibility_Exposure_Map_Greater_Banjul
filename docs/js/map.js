@@ -136,6 +136,134 @@ async function buildExposure(file) {
     <p class="small">OSM data as of ${t.osm_data_as_of.slice(0, 10)}. Roads exclude footpaths and tracks.</p>`;
 }
 
+// Rainfall tab (ToR §5 step 9; Plan §7 outputs 1 and 2, §9 Chart.js).
+// Same colours as outputs/figures/rainfall.png.
+const RAIN = { bar: "#4a90c8", example: "#1f2328", threshold: "#bd0026", grid: "#e5e5e5", text: "#5b636e" };
+let rainData = null;
+let rainDrawn = false;
+
+const MONTH_ABBR = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const shortDate = (iso) => { const [, m, d] = iso.split("-"); return `${Number(d)} ${MONTH_ABBR[Number(m) - 1]}`; };
+
+async function buildRainfall(file) {
+  try {
+    rainData = await (await fetch(`data/${file}`, { cache: "no-store" })).json();
+  } catch {
+    return;
+  }
+  const r = rainData, c = r.climatology, d = r.daily;
+  const julyIdx = 6;
+  const julyRatio = c.example_mm[julyIdx] / c.normal_mm[julyIdx];
+  const peaks = d ? d.peaks.map((p) => `${shortDate(p.date)} (${Math.round(p.mm)} mm)`).join(" and ") : "";
+  const rows = c.months.map((m, i) => `<tr><td>${m}</td><td>${c.normal_mm[i].toFixed(0)}</td><td>${c.example_mm[i].toFixed(0)}</td></tr>`).join("");
+  document.getElementById("rainfall-body").innerHTML = `
+    <p>Almost all rain falls in one short season: <b>${Math.round(c.wet_season_share * 100)}%</b> of the ${c.normal_annual_mm.toLocaleString("en-GB")} mm annual normal falls June–October.</p>
+    <h3>Monthly rainfall (mm)</h3>
+    <div class="chart-box"><canvas id="chart-monthly" role="img"
+      aria-label="Bar chart of mean monthly rainfall ${c.period}, with ${c.example_year} as dots. Table below."></canvas></div>
+    <p class="small">Bars: normal ${c.period}. Dots: ${c.example_year} (${c.example_annual_mm.toLocaleString("en-GB")} mm in the year; July was ${julyRatio.toFixed(1)}× its normal).</p>
+    ${d ? `<h3>Daily rainfall, June–October ${d.year} (mm)</h3>
+    <div class="chart-box"><canvas id="chart-daily" role="img"
+      aria-label="Bar chart of daily rainfall June to October ${d.year} with a heavy-rain line at ${r.threshold_mm} mm."></canvas></div>
+    <p class="small">Dashed line: ${r.threshold_mm} mm/day heavy rain (illustrative). Exceeded on ${d.days_over_threshold} days: ${peaks}.
+      The flood of 30–31 July 2022 shows clearly. CHIRPS daily values are 5-day totals spread over the days, so single-day peaks are understated
+      (Banjul airport measured 276 mm over 30–31 July).</p>` : ""}
+    <div class="callout"><b>Early-warning link.</b> When more than about ${r.threshold_mm} mm of rain falls in a day, the <b>High</b> zones on the map
+      are where water is most likely to pond first. The threshold is illustrative, not an official warning level.</div>
+    <details><summary>Monthly values as a table</summary>
+      <div class="table-wrap"><table class="data-table"><thead><tr><th>Month</th><th>Normal</th><th>${c.example_year}</th></tr></thead>
+      <tbody>${rows}</tbody></table></div></details>
+    <p class="small">${r.source}; ${r.n_cells} cells (about 5.5 km), weighted by land area in the study area.</p>`;
+  if (!document.getElementById("tab-rainfall").hidden) drawRainCharts();
+}
+
+// Chart.js needs a visible canvas to size itself, so draw on first opening of the tab.
+function drawRainCharts() {
+  if (rainDrawn || !rainData || typeof Chart === "undefined") return;
+  rainDrawn = true;
+  const r = rainData, c = r.climatology, d = r.daily;
+  Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+  Chart.defaults.font.size = 11;
+  Chart.defaults.color = RAIN.text;
+  const axes = (ytitle) => ({
+    x: { grid: { display: false } },
+    y: { beginAtZero: true, grid: { color: RAIN.grid }, title: { display: true, text: ytitle } },
+  });
+
+  new Chart(document.getElementById("chart-monthly"), {
+    data: {
+      labels: c.months,
+      datasets: [
+        { type: "bar", label: `Normal ${c.period}`, data: c.normal_mm, backgroundColor: RAIN.bar,
+          borderRadius: 3, barPercentage: 0.75, order: 2 },
+        { type: "line", label: String(c.example_year), data: c.example_mm, showLine: false,
+          pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: RAIN.example,
+          pointBorderColor: "#ffffff", pointBorderWidth: 1.5, order: 1 },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { position: "top", align: "start", labels: { boxWidth: 10, boxHeight: 10 } },
+        tooltip: { callbacks: { label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(0)} mm` } },
+      },
+      scales: axes("mm per month"),
+    },
+  });
+
+  if (!d) return;
+  const peakSet = new Set(d.peaks.map((p) => p.date));
+  // Small plugin: write the date and amount above the days over the threshold.
+  const peakLabels = {
+    id: "peakLabels",
+    afterDatasetsDraw(chart) {
+      const { ctx } = chart;
+      const meta = chart.getDatasetMeta(0);
+      ctx.save();
+      ctx.fillStyle = RAIN.example;
+      ctx.font = `600 10px ${Chart.defaults.font.family}`;
+      ctx.textAlign = "center";
+      d.dates.forEach((iso, i) => {
+        if (!peakSet.has(iso)) return;
+        const bar = meta.data[i];
+        ctx.fillText(`${shortDate(iso)}: ${Math.round(d.mm[i])} mm`, bar.x, bar.y - 5);
+      });
+      ctx.restore();
+    },
+  };
+  new Chart(document.getElementById("chart-daily"), {
+    data: {
+      labels: d.dates.map(shortDate),
+      datasets: [
+        { type: "bar", label: "Daily rainfall", data: d.mm, backgroundColor: RAIN.bar,
+          borderRadius: 2, barPercentage: 1, categoryPercentage: 0.9, order: 2 },
+        { type: "line", label: `${r.threshold_mm} mm/day`, data: d.dates.map(() => r.threshold_mm),
+          borderColor: RAIN.threshold, borderDash: [5, 4], borderWidth: 1.5, pointRadius: 0,
+          pointHitRadius: 0, order: 1 },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          filter: (item) => item.datasetIndex === 0,
+          callbacks: { label: (ctx) => ` ${ctx.parsed.y.toFixed(1)} mm` },
+        },
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { autoSkip: false, maxRotation: 0,
+          callback: (v, i) => (d.dates[i].endsWith("-01") ? MONTH_ABBR[Number(d.dates[i].slice(5, 7)) - 1] : "") } },
+        y: { beginAtZero: true, suggestedMax: Math.max(...d.mm) * 1.2, grid: { color: RAIN.grid },
+          title: { display: true, text: "mm per day" } },
+      },
+    },
+    plugins: [peakLabels],
+  });
+}
+
 // Fallback basemap if the OpenFreeMap style cannot be loaded.
 const FALLBACK_STYLE = {
   version: 8,
@@ -258,17 +386,24 @@ map.on("error", (e) => {
   }
 });
 
+// Panel tables and charts do not depend on the map, so load them straight away.
+const metaReady = loadMeta();
+metaReady.then((meta) => {
+  const available = meta.layers || {};
+  if (available.exposure_tables) buildExposure(available.exposure_tables);
+  if (available.rainfall) buildRainfall(available.rainfall);
+  if (meta.built_utc) document.getElementById("built").textContent = meta.built_utc;
+});
+
 map.on("load", async () => {
-  const meta = await loadMeta();
+  const meta = await metaReady;
   const available = meta.layers || {};
   for (const def of LAYERS) {
     if (available[def.id]) addLayer(def, available[def.id]);
   }
   buildLayerList(available);
-  if (available.exposure_tables) buildExposure(available.exposure_tables);
   buildLegend(available);
   fitToStudyArea();
-  if (meta.built_utc) document.getElementById("built").textContent = meta.built_utc;
 });
 
 // Tabs
@@ -280,8 +415,13 @@ document.querySelectorAll(".tab").forEach((btn) => {
       b.setAttribute("aria-selected", String(on));
       document.getElementById(`tab-${b.dataset.tab}`).hidden = !on;
     });
+    if (btn.dataset.tab === "rainfall") drawRainCharts();
   });
 });
+
+// Open a tab from the URL, e.g. index.html#rainfall
+const startTab = [...document.querySelectorAll(".tab")].find((b) => `#${b.dataset.tab}` === location.hash);
+if (startTab) startTab.click();
 
 // Mobile drawer toggle
 const panel = document.getElementById("panel");

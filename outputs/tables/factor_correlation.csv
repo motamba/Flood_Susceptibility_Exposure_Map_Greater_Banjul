@@ -1,6 +1,6 @@
 ,hand,elevation,depression_depth,twi,landcover
-hand,1.0,0.22,0.27,0.32,0.04
-elevation,0.22,1.0,0.14,-0.02,0.06
-depression_depth,0.27,0.14,1.0,0.22,0.01
-twi,0.32,-0.02,0.22,1.0,-0.0
-landcover,0.04,0.06,0.01,-0.0,1.0
+hand,1.0,0.22,0.28,0.31,0.04
+elevation,0.22,1.0,0.15,-0.02,0.07
+depression_depth,0.28,0.15,1.0,0.22,0.01
+twi,0.31,-0.02,0.22,1.0,-0.0
+landcover,0.04,0.07,0.01,-0.0,1.0

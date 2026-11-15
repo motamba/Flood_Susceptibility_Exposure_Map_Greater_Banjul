@@ -74,6 +74,13 @@ def main() -> None:
         exported["exposure_tables"] = "exposure.json"
         print("[ok] exposure tables")
 
+    # Rainfall tab: chart data from step 7 (Plan §7).
+    rain = DATA_PROCESSED / "rainfall.json"
+    if rain.exists():
+        (WEB_DATA / "rainfall.json").write_text(rain.read_text(encoding="utf-8"), encoding="utf-8")
+        exported["rainfall"] = "rainfall.json"
+        print("[ok] rainfall chart data")
+
     meta = {
         "built_utc": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "disclaimer": cfg["project"]["disclaimer"],
