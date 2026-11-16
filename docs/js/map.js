@@ -1,7 +1,6 @@
 /* Web map logic (ToR §5 step 10; Implementation Plan §9).
  * Layers are loaded from docs/data/, which scripts/09_export_web.py writes.
- * Layers whose data is not built yet are listed as "pending" with the day
- * of the work plan (Plan §11) when they arrive.
+ * Layers whose data file is missing are listed as "not available".
  */
 
 const BASEMAP = "https://tiles.openfreemap.org/styles/positron";
@@ -18,7 +17,7 @@ const GROUP_LABELS = {
 // Drawing order: first entry is drawn at the bottom.
 const LAYERS = [
   {
-    id: "susceptibility", label: "Flood susceptibility", pending: "Day 5", visible: true,
+    id: "susceptibility", label: "Flood susceptibility", visible: true,
     layers: [{
       type: "fill",
       paint: {
@@ -34,7 +33,7 @@ const LAYERS = [
       <p class="small">Relative index from terrain and land cover, not a flood forecast.</p></div>`,
   },
   {
-    id: "water", label: "Water and wetland", pending: "Day 4", visible: true,
+    id: "water", label: "Water and wetland", visible: true,
     layers: [{
       type: "fill",
       paint: {
@@ -65,7 +64,7 @@ const LAYERS = [
     legend: { title: "", items: [{ label: "Study area (incl. Tanbi Wetland)", colour: "#111111", kind: "line" }] },
   },
   {
-    id: "facilities", label: "Schools and health facilities", pending: "Day 6", visible: true,
+    id: "facilities", label: "Schools and health facilities", visible: true,
     layers: [{
       type: "circle",
       paint: {
@@ -84,7 +83,7 @@ const LAYERS = [
       <p class="small">Source: © OpenStreetMap contributors</p></div>`,
   },
   {
-    id: "reported_floods", label: "Reported flood locations", pending: "Day 6", visible: false,
+    id: "reported_floods", label: "Reported flood locations", visible: false,
     layers: [{ type: "circle", paint: { "circle-radius": 6, "circle-color": "#6a3d9a", "circle-stroke-color": "#fff", "circle-stroke-width": 1 } }],
     legend: { title: "Plausibility", items: [{ label: "Reported flood location (news)", colour: "#6a3d9a", kind: "dot" }] },
     popup: (p) => `<div class="popup"><h4>${p.id} ${esc(p.place)}</h4><table>
@@ -290,7 +289,13 @@ map.addControl(new maplibregl.NavigationControl(), "top-left");
 map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-left");
 map.addControl(new maplibregl.AttributionControl({
   compact: true,
-  customAttribution: "Boundaries: geoBoundaries (CC BY 4.0)",
+  customAttribution: [
+    "Terrain: FABDEM (Univ. of Bristol, CC BY-NC-SA 4.0), from Copernicus DEM GLO-30 © DLR, Airbus, provided under COPERNICUS by the EU and ESA",
+    "Land cover: ESA WorldCover 2021 (CC BY 4.0)",
+    "Rainfall: CHIRPS v3 (Climate Hazards Center, UCSB)",
+    "Assets: © OpenStreetMap contributors (ODbL)",
+    "Boundaries: geoBoundaries (CC BY 4.0)",
+  ].join(" · "),
 }));
 
 async function loadMeta() {
@@ -341,7 +346,7 @@ function buildLayerList(available) {
     const inputId = `toggle-${def.id}`;
     li.innerHTML = `<input type="checkbox" id="${inputId}" ${ready && def.visible ? "checked" : ""} ${ready ? "" : "disabled"}>
       <label for="${inputId}">${def.label}</label>
-      ${ready ? "" : `<span class="badge">pending · ${def.pending}</span>`}`;
+      ${ready ? "" : `<span class="badge">not available</span>`}`;
     if (ready) {
       li.querySelector("input").addEventListener("change", (e) => setVisible(def, e.target.checked));
     }
@@ -428,5 +433,6 @@ const panel = document.getElementById("panel");
 document.getElementById("panel-toggle").addEventListener("click", (e) => {
   const collapsed = panel.classList.toggle("collapsed");
   e.currentTarget.setAttribute("aria-expanded", String(!collapsed));
+  e.currentTarget.textContent = collapsed ? "Show panel" : "Hide panel";
   map.resize();
 });

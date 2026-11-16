@@ -140,7 +140,7 @@ With only 8 points, this is a check that the map is plausible, not a validation.
 CHIRPS cells are 0.05° (about 5.5 km), so only 19 cells cover Greater Banjul. The study-area series is their mean, each cell weighted by the area of study-area land inside it.
 
 - **One short wet season:** the 1991–2020 normal is 1,016 mm a year, and 99% of it falls from June to October. August is the wettest month (357 mm).
-- **2022 was wet, and July most of all:** 410 mm in July 2022, 1.7 times the July normal. The year total was 1,254 mm, 9th highest of 1991–2025.
+- **2022 was wet, and July most of all:** 410 mm in July 2022, 1.7 times the July normal and the 3rd-wettest July since 1991 (after 2024 and 2020). The year total was 1,254 mm, 9th highest of 1991–2025.
 - **The 30–31 July 2022 flood:** CHIRPS gives 146 mm for the two days, about half of the 276 mm measured at Banjul airport. A 5.5 km satellite-based cell smooths out local downpours, and CHIRPS v3 daily values are 5-day totals spread over days. The *timing* is right; the *size* of single-day peaks is understated.
 - **Heavy-rain line (50 mm/day):** two days of the 2022 season exceeded it (31 July and 8 August). The 95th percentile of wet days was 43 mm. The line is illustrative, not an official warning level.
 

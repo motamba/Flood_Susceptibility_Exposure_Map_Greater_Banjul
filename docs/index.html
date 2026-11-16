@@ -15,7 +15,7 @@
       <h1>Greater Banjul Flood Susceptibility</h1>
       <p class="disclaimer">Susceptibility index for learning, <strong>not a flood forecast</strong>. Do not use for planning or safety decisions.</p>
     </div>
-    <button id="panel-toggle" class="panel-toggle" aria-controls="panel" aria-expanded="true">Panel</button>
+    <button id="panel-toggle" class="panel-toggle" aria-controls="panel" aria-expanded="true">Hide panel</button>
   </header>
 
   <main class="layout">
@@ -54,20 +54,36 @@
       <section id="tab-about" class="tab-body" role="tabpanel" hidden>
         <h2>About</h2>
         <p>This map shows where flooding is most likely in Greater Banjul (Banjul, Kanifing Municipal Council and Kombo North), based on terrain and land cover. It also shows which assets lie in the most susceptible areas.</p>
-        <h3>Method (summary)</h3>
-        <p>A weighted overlay of terrain factors: height above nearest drainage, elevation, depression depth, wetness index and land cover. The index is classified into low, medium and high, and the weights are tested in a sensitivity analysis.</p>
+        <h3>Method</h3>
+        <ol class="about-list">
+          <li><b>Terrain:</b> a bare-earth elevation model (FABDEM, 30 m) is reprojected and its hollows breached so water can be routed. Streams, open water and mapped drains form the drainage network.</li>
+          <li><b>Five factors</b>, each scaled 0–1: height above the nearest drainage (weight 0.30), elevation (0.20), depth of hollows where water ponds (0.20), wetness index (0.15) and land cover (0.15).</li>
+          <li><b>Index and classes:</b> the weighted sum is split into Low, Medium and High with natural breaks (Jenks).</li>
+          <li><b>Sensitivity:</b> 11 alternative weightings. The High zone keeps 80–94% overlap under moderate changes. Elevation is the most influential factor.</li>
+          <li><b>Exposure:</b> OpenStreetMap buildings, roads, schools and health facilities are counted per class.</li>
+          <li><b>Plausibility:</b> 5 of 8 places reported as flooded in the news lie in High, which covers 36% of the land.</li>
+        </ol>
         <h3>Limitations</h3>
-        <ul>
-          <li>The elevation data has 30 m resolution, which limits detail in flat coastal areas.</li>
-          <li>No ground-truth flood data; plausibility checks only.</li>
-          <li>Weights are subjective and are tested for sensitivity.</li>
+        <ul class="about-list">
+          <li>30 m elevation cannot see drains, culverts or walls. Blocked drains, a common cause of flooding here, are not in the model.</li>
+          <li>There is no observed flood map to validate against. The check against news reports uses only 8 places.</li>
+          <li>The weights are expert judgement. Exposure counts change with them (23–43% of buildings in High).</li>
+          <li>OpenStreetMap is incomplete, so all counts are minimum values.</li>
+          <li>Rainfall cells are about 5.5 km wide and smooth out local downpours.</li>
         </ul>
         <h3>Data and licences</h3>
-        <ul>
-          <li>Boundaries: geoBoundaries (CC BY 4.0)</li>
-          <li>Basemap: OpenFreeMap, © OpenStreetMap contributors (ODbL)</li>
+        <ul class="about-list">
+          <li>Elevation: FABDEM V1-2, Hawker et al. (2022), University of Bristol, CC BY-NC-SA 4.0. Based on Copernicus DEM GLO-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018, provided under COPERNICUS by the European Union and ESA.</li>
+          <li>Land cover: ESA WorldCover 2021 v200, Zanaga et al. (2022), CC BY 4.0.</li>
+          <li>Buildings, roads, facilities, drains: © OpenStreetMap contributors, ODbL 1.0 (extract by Geofabrik, data as of 11 Nov 2026).</li>
+          <li>Rainfall: CHIRPS v3.0, Climate Hazards Center, UC Santa Barbara; Funk et al. (2026), <i>Sci Data</i> 13, 718. Public domain.</li>
+          <li>Boundaries: geoBoundaries gbOpen GMB ADM2, CC BY 4.0.</li>
+          <li>Reported floods: Gambian news reports, cited with links in the popups.</li>
+          <li>Basemap: OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors.</li>
         </ul>
-        <p class="small">Personal project, November 2026. Data build: <span id="built">-</span></p>
+        <p>Code, full method and reproducible pipeline:
+          <a href="https://github.com/motamba/Flood_Susceptibility_Exposure_Map_Greater_Banjul" target="_blank" rel="noopener">GitHub repository</a> (MIT licence for the code).</p>
+        <p class="small">Personal project by Modou Tamba, November 2026. Data build: <span id="built">-</span></p>
       </section>
     </aside>
   </main>
