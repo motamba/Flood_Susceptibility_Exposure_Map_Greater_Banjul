@@ -4,6 +4,10 @@
 
 project:
   name: flood-susceptibility-greater-banjul
+  title: Flood Susceptibility and Exposure Map, Greater Banjul
+  author: Modou Tamba
+  live_url: https://motamba.github.io/Flood_Susceptibility_Exposure_Map_Greater_Banjul/
+  repo_url: https://github.com/motamba/Flood_Susceptibility_Exposure_Map_Greater_Banjul
   # Shown in the web map and README (ToR §9, §11)
   disclaimer: >-
     Susceptibility index for illustration and learning, not a validated flood

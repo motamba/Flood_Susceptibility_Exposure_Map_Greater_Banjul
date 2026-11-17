@@ -1,12 +1,20 @@
 # Flood Susceptibility and Exposure Web Map for Greater Banjul
 
-> **Work in progress** (personal project, November 2026). The full README follows on Day 10 of the work plan.
+**[Live map](https://motamba.github.io/Flood_Susceptibility_Exposure_Map_Greater_Banjul/)** · **[One-page summary (PDF)](reports/summary.pdf)** · personal project, November 2026
 
 > **Disclaimer:** this project produces a *susceptibility index*, not a validated flood forecast. It is for illustration and learning, and must not be used for planning or safety decisions.
 
-## Purpose
+Where in Greater Banjul (The Gambia) is flooding most likely, and what stands there? This project answers both questions from open data. It combines terrain and land cover into a flood-susceptibility index, counts the buildings, roads, schools and health facilities in each class, and publishes the result as an interactive web map with rainfall context. Everything is built by a reproducible Python pipeline (`make all`).
 
-This repository identifies areas in Greater Banjul (The Gambia) that are most likely to flood, based on terrain and land cover. It then counts the buildings, roads, schools and health facilities in those areas. The results are published as an interactive web map. Everything is built from open data with a reproducible Python pipeline.
+![One-page summary](reports/summary.png)
+
+**Main results**
+
+- **High susceptibility covers 96 km², 36% of the land.** It includes Banjul, the coast of Kanifing, the Kotu Creek valley and the edges of the Tanbi Wetland.
+- **37,440 buildings (34%) stand in High zones**, including 97% of Banjul's buildings, 25 of 93 schools and 4 of 28 health facilities mapped in OpenStreetMap (minimum counts).
+- **The map is robust to moderate weight changes:** the High zone keeps 80–94% overlap under 6 alternative weightings. Elevation is the most influential factor.
+- **5 of 8 places reported flooded in the news lie in High**, which covers 36% of the land. All 8 lie in High or Medium.
+- **99% of the 1,016 mm annual rain falls June–October.** The flood of 30–31 July 2022 is the largest daily peak of that season in the CHIRPS data.
 
 ## Study area
 
@@ -32,7 +40,28 @@ All sources were checked on 12 November 2026. Rasters are read remotely and clip
 
 **Note on daily rainfall:** CHIRPS v3 daily values are not an independent daily product. They are 5-day (pentadal) totals spread across days using IMERG satellite timing (the `sat` variant). Daily peaks therefore show the timing only approximately; monthly totals are more reliable.
 
-## Method notes
+## Method and results
+
+```mermaid
+flowchart LR
+  A[Boundaries<br>geoBoundaries] --> S[00 Study area]
+  B[FABDEM, WorldCover,<br>OSM, CHIRPS] --> D[01 Download<br>+ manifest]
+  S --> D
+  D --> H[02 DEM and hydrology<br>breach, flow, streams]
+  H --> F[03 Five factors<br>scaled 0-1]
+  F --> O[04 Weighted overlay<br>Jenks classes]
+  O --> E[06 Exposure<br>OSM assets per class]
+  E --> W[05 Sensitivity<br>11 weightings]
+  O --> P[08 Plausibility<br>news-reported floods]
+  D --> R[07 Rainfall<br>CHIRPS climatology]
+  E --> X[09 Web export]
+  P --> X
+  R --> X
+  X --> M[Web map, docs/]
+  X --> Q[10 Summary PDF]
+```
+
+All parameters (weights, thresholds, class count, dates) are in [`config/config.yaml`](config/config.yaml). Each step below names its script.
 
 ### DEM preparation and hydrology (`scripts/02_prepare_dem.py`)
 
@@ -104,7 +133,7 @@ OSM buildings, roads, schools and health facilities inside the study area were a
 | Asset (OSM, 11 Nov 2026) | In High | Share in High | Total |
 |---|---|---|---|
 | *Land area (reference)* | *95.5 km²* | *36%* | *266 km²* |
-| Buildings | 37,439 | 34% | 111,418 |
+| Buildings | 37,440 | 34% | 111,418 |
 | Vehicle roads | 890 km | 28% | 3,191 km |
 | Schools | 25 | 27% | 93 |
 | Health facilities | 4 | 14% | 28 |
@@ -148,6 +177,34 @@ CHIRPS cells are 0.05° (about 5.5 km), so only 19 cells cover Greater Banjul. T
 
 ![Rainfall](outputs/figures/rainfall.png)
 
+## Limitations
+
+- **Terrain resolution:** FABDEM is a 30 m model whose vertical error is of the order of metres. Banjul and the coast are only 1–5 m above sea level, so the index cannot separate streets that differ by tens of centimetres. FABDEM removes buildings and trees, but some bias remains in dense areas.
+- **Drainage infrastructure is invisible:** drains, culverts, walls and blocked channels are not in the elevation data. The news reports name blocked drains and building on waterways as main causes of flooding (Tallinding, Latrikunda Sabiji), and the model cannot represent either.
+- **No ground truth:** there is no observed flood map for Greater Banjul. The plausibility check uses only 8 places named in news reports, located at settlement or bridge level. It shows the map is plausible; it does not validate it.
+- **Subjective weights:** the weights are expert judgement. The High zone is fairly stable, but exposure counts are not: the share of buildings in High ranges from 23% to 43% across scenarios.
+- **OpenStreetMap is incomplete:** all counts are minimum values. Facility coverage in particular is uneven, and building footprints come from imagery of different dates.
+- **Rainfall resolution:** CHIRPS cells are about 5.5 km wide, and v3 daily values are 5-day totals spread over days. CHIRPS gives 146 mm for 30–31 July 2022, against 276 mm measured at Banjul airport.
+- **Susceptibility, not hazard:** the index ranks where water is likely to collect. It says nothing about flood depth, duration or probability, and it does not model sea-level rise or storm surge.
+
+## Quality checks
+
+| Check | Result |
+|---|---|
+| Automated tests (`make test`): weights, value ranges, projections, table totals, sources | 12 of 12 pass |
+| Reproducibility: clean copy with raw data only, then `make all` | All tables and map layers identical; 4.5 min |
+| Spot check of 17 well-known places | Low-lying places (Ebo Town, Old Jeshwang, Serrekunda) High; cliff tops and heights (Fajara, Bakau, Brufut Heights) Low |
+| Streams vs OSM waterways | Agreement where both exist; low overall because OSM maps tidal creeks and urban drains ([table](outputs/tables/stream_threshold_tuning.csv)) |
+| Web data budget | 2.9 MB of 5 MB |
+
+## Next steps: towards early warning
+
+1. **Satellite flood extent:** map the July 2022 flood from Sentinel-1 radar (before and after the event) to test the index on thousands of pixels instead of 8 places.
+2. **Rainfall triggers:** link the High zones to a rain forecast or a gauge alert (for example over 50 mm in 24 hours), so the map shows where to look first when heavy rain is forecast.
+3. **Drainage data:** add the drain network and known blockages from the councils. This is the largest gap in the model.
+4. **People, not only buildings:** add population grids (WorldPop or GHSL) to estimate how many people live in High zones.
+5. **Local validation:** collect flood marks and residents' reports with the councils or the Gambia Red Cross to build a proper validation set.
+
 ## Reproduce
 
 ```bash
@@ -163,6 +220,16 @@ make test
 Raw data is downloaded by the scripts and is not stored in Git. Every downloaded file is listed with its URL, date, licence and checksum in [`data/raw/MANIFEST.csv`](data/raw/MANIFEST.csv).
 
 Preview the map locally with `make serve`, then open http://localhost:8000.
+
+**Run time:** once the raw data is downloaded, `make all` takes about 4.5 minutes. The first download is slower: the CHIRPS server limits request rates, so the about 570 rainfall files are fetched with pauses and automatic back-off, and an interrupted download resumes where it stopped.
+
+## References
+
+- Funk, C. et al. (2026). CHIRPS v3. *Scientific Data* 13, 718.
+- Hawker, L. et al. (2022). A 30 m global map of elevation with forests and buildings removed (FABDEM). *Environmental Research Letters* 17, 024016.
+- Nobre, A. D. et al. (2011). Height Above the Nearest Drainage: a hydrologically relevant new terrain model. *Journal of Hydrology* 404, 13–29.
+- Zanaga, D. et al. (2022). ESA WorldCover 10 m 2021 v200. Zenodo.
+- Runfola, D. et al. (2020). geoBoundaries: a global database of political administrative boundaries. *PLoS ONE* 15(4), e0231866.
 
 ## Licence
 
