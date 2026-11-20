@@ -64,7 +64,7 @@ def main() -> None:
     fig.text(0.05, 0.965, p["title"], fontsize=15, fontweight="bold", color=INK, va="top")
     fig.text(0.05, 0.937, f"Banjul, Kanifing and Kombo North, The Gambia  ·  {p['author']}  ·  "
              f"personal project, November 2026", fontsize=8.5, color=MUTED, va="top")
-    fig.text(0.05, 0.92, "Susceptibility index for learning, not a flood forecast. "
+    fig.text(0.05, 0.92, "Susceptibility index, not a flood forecast. "
              "Do not use for planning or safety decisions.", fontsize=8.5, color=WARN,
              fontweight="bold", va="top")
 
@@ -169,7 +169,10 @@ def main() -> None:
              "Funk et al. 2026); geoBoundaries (CC BY 4.0); Gambian news reports (cited in the repository).",
              fontsize=6.3, color=MUTED, va="top", linespacing=1.45)
 
-    fig.savefig(REPORTS / "summary.pdf")
+    fig.savefig(REPORTS / "summary.pdf", metadata={
+        "Title": p["title"], "Author": p["author"],
+        "Subject": "One-page summary: flood susceptibility, exposure and rainfall context",
+        "Keywords": "flood susceptibility, exposure, Greater Banjul, The Gambia"})
     fig.savefig(REPORTS / "summary.png", dpi=110)
     print(f"[ok] {REPORTS / 'summary.pdf'}")
 

@@ -1,6 +1,6 @@
 {
   "built_utc": "2026-11-17 15:26 UTC",
-  "disclaimer": "Susceptibility index for illustration and learning, not a validated flood forecast. Do not use for planning or safety decisions.",
+  "disclaimer": "Personal project. Susceptibility index, not a validated flood forecast. Do not use for planning or safety decisions.",
   "layers": {
     "study_area": "study_area.geojson",
     "units": "units.geojson",

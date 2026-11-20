@@ -1,8 +1,8 @@
 # Flood Susceptibility and Exposure Web Map for Greater Banjul
 
-**[Live map](https://motamba.github.io/Flood_Susceptibility_Exposure_Map_Greater_Banjul/)** · **[One-page summary (PDF)](reports/summary.pdf)** · personal project, November 2026
+**[Live map](https://motamba.github.io/Flood_Susceptibility_Exposure_Map_Greater_Banjul/)** · **[One-page summary (PDF)](reports/summary.pdf)** · **[20 s demo video](reports/demo.mp4)** · personal project, November 2026
 
-> **Disclaimer:** this project produces a *susceptibility index*, not a validated flood forecast. It is for illustration and learning, and must not be used for planning or safety decisions.
+> **Disclaimer:** this project produces a *susceptibility index*, not a validated flood forecast, and must not be used for planning or safety decisions.
 
 Where in Greater Banjul (The Gambia) is flooding most likely, and what stands there? This project answers both questions from open data. It combines terrain and land cover into a flood-susceptibility index, counts the buildings, roads, schools and health facilities in each class, and publishes the result as an interactive web map with rainfall context. Everything is built by a reproducible Python pipeline (`make all`).
 

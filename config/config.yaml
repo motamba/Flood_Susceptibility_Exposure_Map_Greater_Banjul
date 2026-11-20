@@ -10,8 +10,8 @@ project:
   repo_url: https://github.com/motamba/Flood_Susceptibility_Exposure_Map_Greater_Banjul
   # Shown in the web map and README (ToR §9, §11)
   disclaimer: >-
-    Susceptibility index for illustration and learning, not a validated flood
-    forecast. Do not use for planning or safety decisions.
+    Personal project. Susceptibility index, not a validated flood forecast.
+    Do not use for planning or safety decisions.
 
 # --- Study area (ToR §3; Plan §4) -------------------------------------------
 study_area:
